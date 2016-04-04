@@ -42,7 +42,7 @@ try {
   var banned_list = fs.readFileSync(path.join(__dirname, './torlist')).toString('utf-8').split('\n');
   banned_list.map(function(ip) {
     ip = ip.trim();
-    if (ip != '') {
+    if (ip !== '') {
       banned_ips[ip] = true;
     }
   });
@@ -209,7 +209,7 @@ function textRequestHandler(req, res, number, carrier, region, key) {
         }
       });
     }, 1000*60*3);
-    if (num > 3) {
+    if (text.burstLimiting===true && num > 3) {
       //mpq.track('exceeded phone quota', tracking_details);
       res.send({success:false, message:'Exceeded quota for this phone number. ' + number});
       return;
@@ -222,7 +222,7 @@ function textRequestHandler(req, res, number, carrier, region, key) {
         res.send({success:false, message:'Could not validate IP quota.'});
         return;
       }
-      if (num > 75) {
+      if (num > text.rateLimitIP && text.rateLimitIP > 0) {
         mpq.track('exceeded ip quota', tracking_details);
         res.send({success:false, message:'Exceeded quota for this IP address. ' + ip});
         return;
